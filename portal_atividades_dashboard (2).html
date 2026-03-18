@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal de Atividades</title>
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="16" fill="%23fff7fb"/%3E%3Ccircle cx="32" cy="32" r="8" fill="%23ffd36e"/%3E%3Cg fill="%23f6a6c9"%3E%3Cellipse cx="32" cy="16" rx="8" ry="12"/%3E%3Cellipse cx="48" cy="32" rx="12" ry="8"/%3E%3Cellipse cx="32" cy="48" rx="8" ry="12"/%3E%3Cellipse cx="16" cy="32" rx="12" ry="8"/%3E%3Cellipse cx="43.3" cy="20.7" rx="7" ry="10" transform="rotate(45 43.3 20.7)"/%3E%3Cellipse cx="43.3" cy="43.3" rx="7" ry="10" transform="rotate(135 43.3 43.3)"/%3E%3Cellipse cx="20.7" cy="43.3" rx="7" ry="10" transform="rotate(45 20.7 43.3)"/%3E%3Cellipse cx="20.7" cy="20.7" rx="7" ry="10" transform="rotate(135 20.7 20.7)"/%3E%3C/g%3E%3C/svg%3E' />
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #fdf6fb; color: #5c4b57; }
+    .layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+    .sidebar { background: #f3d9e8; color: #6d4c5b; padding: 24px 18px; position: sticky; top: 0; height: 100vh; }
+    .brand { font-size: 22px; font-weight: 700; margin-bottom: 28px; }
+    .brand span { color: #d98bb3; }
+    .menu { display: flex; flex-direction: column; gap: 10px; }
+    .menu a { text-decoration: none; color: #8d6b7d; padding: 12px 14px; border-radius: 10px; display: block; transition: 0.2s; }
+    .menu a:hover, .menu a.active { background: #e8bfd5; color: #6d4c5b; }
+    .content { padding: 28px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .topbar h1 { margin: 0; font-size: 28px; }
+    .subtitle { margin-top: 6px; color: #9b7c8f; font-size: 14px; }
+    .profile, .panel, .table-wrap, .card { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 4px 12px rgba(201, 141, 173, 0.18); }
+    .profile { font-size: 14px; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .card h3 { margin: 0 0 8px; font-size: 14px; color: #64748b; font-weight: 600; }
+    .card .number { font-size: 30px; font-weight: 700; margin-bottom: 6px; }
+    .card .detail { font-size: 13px; color: #475569; }
+    .grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .panel, .table-wrap { margin-bottom: 24px; padding: 20px; }
+    .panel h2, .section-title { margin: 0 0 18px; font-size: 20px; }
+    .bars { display: flex; align-items: flex-end; gap: 18px; height: 260px; padding-top: 20px; }
+    .bar-group { flex: 1; text-align: center; }
+    .bar { width: 100%; border-radius: 12px 12px 0 0; background: linear-gradient(180deg, #f3bfd8, #d98bb3); position: relative; min-height: 20px; }
+    .bar span { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #334155; font-weight: 700; }
+    .bar-label { margin-top: 10px; font-size: 13px; color: #475569; }
+    .donut-wrap { display: flex; align-items: center; justify-content: center; gap: 22px; flex-wrap: wrap; margin-top: 10px; }
+    .donut { width: 180px; height: 180px; border-radius: 50%; position: relative; background: conic-gradient(#f4b6cf 0 30%, #e79ac0 30% 60%, #d98bb3 60% 85%, #c979a1 85% 100%); }
+    .donut::after { content: "Status"; position: absolute; inset: 28px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #334155; font-size: 18px; }
+    .legend { display: flex; flex-direction: column; gap: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #334155; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .activities-grid, .notes-layout { display: grid; grid-template-columns: repeat(2, minmax(280px, 1fr)); gap: 18px; margin-top: 16px; }
+    .activity-card, .meeting-box { border: 1px solid #f0d7e5; border-radius: 16px; padding: 18px; background: #fff8fc; }
+    .activity-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+    .activity-head h3 { margin: 0; font-size: 16px; }
+    .meta { display: grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; font-size: 13px; color: #475569; }
+    .jira-box, .notes-box, .meeting-box, .timeline-content, .gantt-wrap { background: white; border: 1px dashed #e6bfd4; border-radius: 12px; padding: 12px; color: #7a6070; font-size: 14px; line-height: 1.5; }
+    .jira-box, .notes-box { margin-top: 10px; }
+    .jira-box strong, .notes-box strong, .meeting-box strong, .timeline-content strong, .gantt-wrap strong { display: block; color: #7a5067; margin-bottom: 6px; }
+    .timeline { display: grid; gap: 14px; margin-top: 16px; }
+    .timeline-item { display: grid; grid-template-columns: 140px 1fr auto; gap: 16px; align-items: start; padding: 14px 0; border-bottom: 1px solid #e2e8f0; }
+    .timeline-date { font-weight: 700; color: #c979a1; padding-top: 10px; }
+    .timeline-item.atrasado { background: #fff1f2; border-radius: 12px; padding-left: 12px; padding-right: 12px; }
+    .tag { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .concluido { background: #f9d7e8; color: #9d4b72; }
+    .andamento { background: #dbeafe; color: #1d4ed8; }
+    .pendente { background: #fef3c7; color: #92400e; }
+    .bloqueado { background: #fee2e2; color: #991b1b; }
+    .alta { color: #dc2626; font-weight: 700; }
+    .media { color: #d97706; font-weight: 700; }
+    .baixa { color: #16a34a; font-weight: 700; }
+    .form-grid { display: grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 12px; align-items: end; }
+    .form-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 12px; align-items: end; }
+    .field-full { grid-column: 1 / -1; }
+    label { display: block; font-size: 13px; color: #475569; margin-bottom: 6px; }
+    input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 14px; font-family: inherit; background: white; }
+    textarea { min-height: 96px; resize: vertical; }
+    .btn { padding: 11px 14px; border: none; border-radius: 12px; background: #d98bb3; color: white; font-weight: 700; cursor: pointer; }
+    .btn:hover { opacity: 0.95; }
+    .btn-secondary { background: #c979a1; }
+    .btn-danger { background: #dc2626; }
+    .btn-light { background: #f3d9e8; color: #7a5067; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .list-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .helper { color: #a07d91; font-size: 13px; }
+    .note-large { min-height: 220px; white-space: pre-wrap; }
+    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .status-list { display: grid; gap: 10px; }
+    .status-item strong { display: block; margin-bottom: 6px; }
+    .progress { height: 10px; background: #f1dbe7; border-radius: 999px; overflow: hidden; }
+    .progress > div { height: 100%; background: #d98bb3; border-radius: 999px; }
+    .link-button { display: inline-block; text-decoration: none; margin-top: 6px; }
+    .test-panel { background: #fff8fc; border: 1px solid #f0d7e5; border-radius: 12px; padding: 12px; font-size: 13px; color: #7a6070; margin-top: 12px; }
+    .test-ok { color: #166534; font-weight: 700; }
+    .test-fail { color: #991b1b; font-weight: 700; }
+    .gantt-grid { display: grid; gap: 10px; margin-top: 12px; }
+    .gantt-row { display: grid; grid-template-columns: 180px 1fr; gap: 12px; align-items: center; }
+    .gantt-track { position: relative; height: 28px; background: linear-gradient(to right, #f1f5f9 0, #f1f5f9 calc(20% - 1px), #e2e8f0 calc(20% - 1px), #e2e8f0 20%, #f1f5f9 20%, #f1f5f9 calc(40% - 1px), #e2e8f0 calc(40% - 1px), #e2e8f0 40%, #f1f5f9 40%, #f1f5f9 calc(60% - 1px), #e2e8f0 calc(60% - 1px), #e2e8f0 60%, #f1f5f9 60%, #f1f5f9 calc(80% - 1px), #e2e8f0 calc(80% - 1px), #e2e8f0 80%, #f1f5f9 80%); border-radius: 999px; overflow: hidden; }
+    .gantt-bar { position: absolute; top: 4px; height: 20px; border-radius: 999px; background: #d98bb3; color: white; font-size: 12px; display: flex; align-items: center; justify-content: center; padding: 0 8px; white-space: nowrap; }
+    .gantt-bar.atrasado { background: #dc2626; }
+    .gantt-header { display: grid; grid-template-columns: 180px 1fr; gap: 12px; color: #64748b; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+    .gantt-header-weeks { display: grid; grid-template-columns: repeat(5, 1fr); }
+    .gantt-header-weeks span { text-align: center; }
+    @media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, minmax(180px, 1fr)); } .grid, .kpi-grid, .form-grid, .form-grid-3 { grid-template-columns: 1fr; } .gantt-row, .gantt-header { grid-template-columns: 1fr; } }
+    @media (max-width: 780px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } .cards, .activities-grid, .notes-layout { grid-template-columns: 1fr; } .content { padding: 18px; } .timeline-item { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">Portal <span>de Atividades</span></div>
+      <nav class="menu">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#atividades">Atividades</a>
+        <a href="#cronograma">Cronograma</a>
+        <a href="#reunioes">Reuniões</a>
+        <a href="#notas">Anotações</a>
+      </nav>
+    </aside>
+    <main class="content">
+      <div class="topbar">
+        <div>
+          <h1>Acompanhamento de Atividades</h1>
+          <div class="subtitle">Visão gerencial das atividades, entregas e prioridades</div>
+        </div>
+        <div class="profile">
+          <strong>Responsável:</strong> Fernanda Freitas<br />
+          <span id="lastUpdate">Atualizado em: --/--/----</span>
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn btn-light" id="exportDataBtn" type="button">Exportar dados</button>
+            <button class="btn btn-light" id="importDataBtn" type="button">Importar dados</button>
+            <input id="importFileInput" type="file" accept="application/json" style="display:none;" />
+          </div>
+        </div>
+      </div>
+      <section class="cards">
+        <div class="card"><h3>Total de atividades</h3><div class="number" id="kpiTotal">0</div><div class="detail">Atividades cadastradas</div></div>
+        <div class="card"><h3>Concluídas</h3><div class="number" id="kpiDone">0</div><div class="detail">Atividades finalizadas</div></div>
+        <div class="card"><h3>Em andamento</h3><div class="number" id="kpiDoing">0</div><div class="detail">Demandas ativas</div></div>
+        <div class="card"><h3>Bloqueadas</h3><div class="number" id="kpiBlocked">0</div><div class="detail">Dependem de retorno</div></div>
+      </section>
+      <section class="grid">
+        <div class="panel">
+          <h2>Atividades por Semana</h2>
+          <div style="margin-bottom:10px;">
+            <label for="monthFilter">Selecionar mês</label>
+            <input type="month" id="monthFilter" />
+          </div>
+          <div class="bars" id="weeklyBars"></div>
+        </div>
+        <div class="panel">
+          <h2>Distribuição por Status</h2>
+          <div class="donut-wrap">
+            <div class="donut" id="statusDonut"></div>
+            <div class="legend">
+              <div class="legend-item"><span class="dot" style="background:#f4b6cf"></span> Concluído</div>
+              <div class="legend-item"><span class="dot" style="background:#e79ac0"></span> Em andamento</div>
+              <div class="legend-item"><span class="dot" style="background:#d98bb3"></span> Pendente</div>
+              <div class="legend-item"><span class="dot" style="background:#c979a1"></span> Bloqueado</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="table-wrap" id="atividades">
+        <div class="toolbar"><div><h2 class="section-title" style="margin-bottom:6px;">Atividades com Anotações e Link do Card</h2><div class="helper">Adicione, edite, filtre e pesquise atividades diretamente na tela.</div></div></div>
+        <div class="table-wrap" style="background:#fff8fc; box-shadow:none; border:1px solid #f0d7e5;">
+          <div class="form-grid">
+            <div><label for="searchActivity">Buscar atividade</label><input id="searchActivity" type="text" placeholder="Digite título, categoria ou ferramenta" /></div>
+            <div><label for="filterStatus">Filtrar por status</label><select id="filterStatus"><option value="">Todos</option><option value="andamento">Em andamento</option><option value="concluido">Concluído</option><option value="pendente">Pendente</option><option value="bloqueado">Bloqueado</option></select></div>
+            <div><label for="filterPriority">Filtrar por prioridade</label><select id="filterPriority"><option value="">Todas</option><option value="alta">Alta</option><option value="media">Média</option><option value="baixa">Baixa</option></select></div>
+            <div><label for="filterTool">Filtrar por ferramenta</label><select id="filterTool"><option value="">Todas</option><option value="Jira">Jira</option><option value="ClickUp">ClickUp</option><option value="Power BI">Power BI</option><option value="Catálogo">Catálogo</option></select></div>
+          </div>
+          <div class="actions"><button class="btn btn-light" id="clearFiltersBtn" type="button">Limpar filtros</button></div>
+        </div>
+        <div class="table-wrap" style="background:#fff8fc; box-shadow:none; border:1px solid #f0d7e5;">
+          <div class="form-grid">
+            <div><label for="activityTitle">Título</label><input id="activityTitle" type="text" placeholder="Ex: Atualização do dashboard" /></div>
+            <div><label for="activityStatus">Status</label><select id="activityStatus"><option value="andamento">Em andamento</option><option value="concluido">Concluído</option><option value="pendente">Pendente</option><option value="bloqueado">Bloqueado</option></select></div>
+            <div><label for="activityPriority">Prioridade</label><select id="activityPriority"><option value="alta">Alta</option><option value="media">Média</option><option value="baixa">Baixa</option></select></div>
+            <div><label for="activityDueDate">Prazo</label><input id="activityDueDate" type="date" /></div>
+            <div><label for="activityCategory">Categoria</label><input id="activityCategory" type="text" placeholder="Ex: Power BI" /></div>
+            <div><label for="activityTool">Ferramenta</label><select id="activityTool"><option value="">Selecione</option><option value="Jira">Jira</option><option value="ClickUp">ClickUp</option><option value="Power BI">Power BI</option><option value="Catálogo">Catálogo</option></select></div>
+            <div class="field-full"><label for="activityLink">Link do card</label><input id="activityLink" type="url" placeholder="https://..." /></div>
+            <div class="field-full"><label for="activityNotes">Anotações</label><textarea id="activityNotes" placeholder="Escreva observações, andamento, bloqueios ou entregas."></textarea></div>
+          </div>
+          <div class="actions"><button class="btn" id="saveActivityBtn" type="button">Salvar atividade</button><button class="btn btn-light" id="resetActivityBtn" type="button">Limpar</button></div>
+        </div>
+        <div class="activities-grid" id="activitiesContainer"></div>
+      </section>
+      <section class="table-wrap" id="cronograma">
+        <div class="toolbar"><div><h2 class="section-title" style="margin-bottom:6px;">Cronograma de Atividades</h2><div class="helper">Cadastre marcos, entregas e próximos passos. Itens vencidos ficam em vermelho. A visão Gantt é baseada nas atividades cadastradas.</div></div></div>
+        <div class="table-wrap" style="background:#fff8fc; box-shadow:none; border:1px solid #f0d7e5;">
+          <div class="form-grid-3">
+            <div><label for="timelineDate">Data</label><input id="timelineDate" type="date" /></div>
+            <div><label for="timelineTitle">Título</label><input id="timelineTitle" type="text" placeholder="Ex: Entrega do dashboard atualizado" /></div>
+            <div><label for="timelineDescription">Descrição</label><input id="timelineDescription" type="text" placeholder="Resumo do que será feito" /></div>
+          </div>
+          <div class="actions"><button class="btn" id="saveTimelineBtn" type="button">Salvar cronograma</button><button class="btn btn-light" id="resetTimelineBtn" type="button">Limpar</button></div>
+        </div>
+        <div class="timeline" id="timelineContainer"></div>
+        <div class="gantt-wrap" id="ganttView"><strong>Visão Gantt do mês selecionado</strong><div class="gantt-header"><div>Atividade</div><div class="gantt-header-weeks"><span>Sem 1</span><span>Sem 2</span><span>Sem 3</span><span>Sem 4</span><span>Sem 5</span></div></div><div class="gantt-grid" id="ganttRows"></div></div>
+      </section>
+      <section class="table-wrap" id="reunioes">
+        <div class="toolbar"><div><h2 class="section-title" style="margin-bottom:6px;">Notas de Reuniões</h2><div class="helper">Com data e hora, busca, filtro por período, data específica e lista de títulos.</div></div></div>
+        <div class="table-wrap" style="background:#fff8fc; box-shadow:none; border:1px solid #f0d7e5;">
+          <div class="form-grid-3">
+            <div><label for="meetingTitle">Título da reunião</label><input id="meetingTitle" type="text" placeholder="Ex: Reunião com gestor" /></div>
+            <div><label for="meetingDate">Data e hora da reunião</label><input id="meetingDate" type="datetime-local" style="border:2px solid #d98bb3; background:#fff1f7;" /></div>
+            <div><label for="meetingTopic">Tema</label><input id="meetingTopic" type="text" placeholder="Ex: alinhamento de prioridades" /></div>
+            <div><label for="meetingPeriodFilter">Filtro por período</label><select id="meetingPeriodFilter"><option value="">Todos</option><option value="today">Hoje</option><option value="week">Esta semana</option><option value="month">Este mês</option><option value="custom">Data específica</option></select></div>
+            <div><label for="meetingCustomDate">Data específica</label><input id="meetingCustomDate" type="date" /></div>
+            <div><label for="meetingSort">Ordenação</label><select id="meetingSort"><option value="desc">Mais recente primeiro</option><option value="asc">Mais antiga primeiro</option></select></div>
+            <div><label for="meetingTitleFilter">Lista de títulos</label><select id="meetingTitleFilter"><option value="">Todos os títulos</option></select></div>
+            <div><label for="meetingSearchText">Buscar por título ou tema</label><input id="meetingSearchText" type="text" placeholder="Digite parte do título, tema ou nota" /></div>
+            <div class="field-full"><label for="meetingNotes">Notas</label><textarea id="meetingNotes" placeholder="Registre tópicos, decisões e próximos passos."></textarea></div>
+          </div>
+          <div class="actions"><button class="btn" id="saveMeetingBtn" type="button">Salvar reunião</button><button class="btn btn-light" id="resetMeetingBtn" type="button">Limpar</button></div>
+        </div>
+        <div class="notes-layout" id="meetingsContainer"></div>
+      </section>
+      <section class="table-wrap" id="notas">
+        <div class="toolbar"><div><h2 class="section-title" style="margin-bottom:6px;">Espaço Geral para Anotações</h2><div class="helper">Use para ideias, lembretes e decisões rápidas.</div></div></div>
+        <div class="table-wrap" style="background:#fff8fc; box-shadow:none; border:1px solid #f0d7e5;"><label for="generalNotesInput">Anotações gerais</label><textarea id="generalNotesInput" class="note-large" placeholder="Escreva aqui suas anotações gerais..."></textarea><div class="actions"><button class="btn" id="saveGeneralNotesBtn" type="button">Salvar anotações</button></div></div>
+        <div class="notes-box note-large" id="generalNotesDisplay"></div>
+      </section>
+      <section class="table-wrap" id="indicadores-js">
+        <h2 class="section-title">Indicadores Automáticos</h2>
+        <div class="kpi-grid">
+          <div style="background:#fff8fc;border:1px solid #f0d7e5;border-radius:16px;padding:16px;"><h3 style="margin:0 0 12px;font-size:16px;">Por Status</h3><div id="statusChart" class="status-list"></div></div>
+          <div style="background:#fff8fc;border:1px solid #f0d7e5;border-radius:16px;padding:16px;"><h3 style="margin:0 0 12px;font-size:16px;">Por Prioridade</h3><div id="priorityChart" class="status-list"></div></div>
+        </div>
+        <div class="test-panel" id="testResults">Executando testes internos...</div>
+      </section>
+    </main>
+  </div>
+  <script>
+    (function () {
+      const STORAGE_KEY = 'portalAtividadesData';
+      const TOOL_OPTIONS = ['Jira', 'ClickUp', 'Power BI', 'Catálogo'];
+      const state = {
+        activities: [
+          { title: 'Atualização do dashboard de indicadores', status: 'andamento', priority: 'alta', dueDate: '2026-03-20', category: 'Power BI', tool: 'Jira', link: 'https://example.com/jira-2451', notes: 'Atualizar visuais, revisar fórmulas, validar números com a base final e registrar o que já foi entregue.' },
+          { title: 'Revisão do catálogo de serviços', status: 'concluido', priority: 'media', dueDate: '2026-03-15', category: 'Jira ITSM', tool: 'ClickUp', link: 'https://example.com/clickup-catalogo', notes: 'Estrutura revisada, categorias ajustadas e proposta apresentada para melhorar a navegação dos usuários.' },
+          { title: 'Levantamento de melhorias no portal', status: 'pendente', priority: 'alta', dueDate: '2026-03-22', category: 'Governança', tool: 'Jira', link: 'https://example.com/jira-2510', notes: 'Mapear oportunidades de melhoria, registrar feedbacks recebidos e definir prioridade de implementação.' },
+          { title: 'Apresentação mensal para gestão', status: 'andamento', priority: 'alta', dueDate: '2026-03-29', category: 'Indicadores', tool: 'Power BI', link: 'https://example.com/apresentacao-gestao', notes: 'Consolidar resultados do mês, destacar entregas principais, riscos e próximos marcos para liderança.' }
+        ],
+        timeline: [
+          { date: '2026-03-18', title: 'Revisão da base de indicadores', description: 'Conferir dados, atualizar métricas e validar informações antes da publicação.' },
+          { date: '2026-03-20', title: 'Entrega do dashboard atualizado', description: 'Publicar versão revisada com ajustes de layout, números e indicadores prioritários.' },
+          { date: '2026-03-22', title: 'Levantamento de melhorias do portal', description: 'Apresentar lista inicial de melhorias, riscos e oportunidades encontradas.' },
+          { date: '2026-03-29', title: 'Apresentação mensal para gestão', description: 'Mostrar resultados, volume de atividades, entregas concluídas e próximos passos.' }
+        ],
+        meetings: [
+          { title: 'Reunião com gestor', date: '2026-03-17T09:00', topic: 'alinhamento das prioridades da semana', notes: '- Atualizar dashboard executivo\n- Priorizar melhorias do portal\n- Registrar bloqueios das demandas em andamento' },
+          { title: 'Reunião de acompanhamento', date: '2026-03-19T14:00', topic: 'revisão das entregas e pendências', notes: '- Validar cronograma das atividades\n- Confirmar retorno de áreas envolvidas\n- Definir próximos responsáveis' }
+        ],
+        generalNotes: 'Usar este espaço para registrar ideias, observações do dia, pendências rápidas, decisões tomadas e lembretes importantes.',
+        editingActivity: null,
+        editingTimeline: null,
+        editingMeeting: null
+      };
+      function byId(id) { return document.getElementById(id); }
+      function escapeHtml(value) { return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+      function formatDate(dateString) { if (!dateString) return '-'; const parts = String(dateString).split('T')[0].split('-'); if (parts.length !== 3) return '-'; return parts[2] + '/' + parts[1] + '/' + parts[0]; }
+      function formatDateTime(dateString) { if (!dateString) return '-'; const chunks = String(dateString).split('T'); const datePart = formatDate(chunks[0]); return chunks.length < 2 ? datePart : datePart + ' ' + chunks[1]; }
+      function getDateOnly(dateString) { return String(dateString || '').split('T')[0]; }
+      function getMonthValue(dateString) { const date = dateString ? new Date(dateString) : new Date(); if (Number.isNaN(date.getTime())) return ''; return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0'); }
+      function isSameWeek(targetDate, referenceDate) { const current = new Date(referenceDate); const firstDay = new Date(current); const day = current.getDay(); const diffToMonday = day === 0 ? -6 : 1 - day; firstDay.setDate(current.getDate() + diffToMonday); firstDay.setHours(0, 0, 0, 0); const lastDay = new Date(firstDay); lastDay.setDate(firstDay.getDate() + 6); lastDay.setHours(23, 59, 59, 999); return targetDate >= firstDay && targetDate <= lastDay; }
+      function getStatusLabel(status) { return ({ concluido: 'Concluído', andamento: 'Em andamento', pendente: 'Pendente', bloqueado: 'Bloqueado' })[status] || status; }
+      function getPriorityLabel(priority) { return ({ alta: 'Alta', media: 'Média', baixa: 'Baixa' })[priority] || priority; }
+      function updateTimestamp() { const now = new Date(); byId('lastUpdate').textContent = 'Atualizado em: ' + String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear(); }
+      function getSerializableState() { return { activities: state.activities, timeline: state.timeline, meetings: state.meetings, generalNotes: state.generalNotes }; }
+      function persistState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(getSerializableState())); }
+      function resetActivityForm() { state.editingActivity = null; byId('activityTitle').value = ''; byId('activityStatus').value = 'andamento'; byId('activityPriority').value = 'alta'; byId('activityDueDate').value = ''; byId('activityCategory').value = ''; byId('activityTool').value = ''; byId('activityLink').value = ''; byId('activityNotes').value = ''; }
+      function resetTimelineForm() { state.editingTimeline = null; byId('timelineDate').value = ''; byId('timelineTitle').value = ''; byId('timelineDescription').value = ''; }
+      function resetMeetingForm() { state.editingMeeting = null; byId('meetingTitle').value = ''; byId('meetingDate').value = ''; byId('meetingTopic').value = ''; byId('meetingNotes').value = ''; }
+      function applyImportedState(saved) { if (saved && Array.isArray(saved.activities)) state.activities = saved.activities; if (saved && Array.isArray(saved.timeline)) state.timeline = saved.timeline; if (saved && Array.isArray(saved.meetings)) state.meetings = saved.meetings; if (saved && typeof saved.generalNotes === 'string') state.generalNotes = saved.generalNotes; resetActivityForm(); resetTimelineForm(); resetMeetingForm(); persistState(); }
+      function loadState() { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return; try { applyImportedState(JSON.parse(raw)); } catch (error) { console.error('Erro ao carregar dados salvos:', error); } }
+      function getFilteredActivities() { const search = (byId('searchActivity').value || '').trim().toLowerCase(); const status = byId('filterStatus').value || ''; const priority = byId('filterPriority').value || ''; const tool = (byId('filterTool').value || '').trim().toLowerCase(); return state.activities.filter(function (activity) { const haystack = [activity.title, activity.category, activity.tool, activity.notes].filter(Boolean).map(function (v) { return String(v).toLowerCase(); }); const matchesSearch = !search || haystack.some(function (v) { return v.includes(search); }); const matchesStatus = !status || activity.status === status; const matchesPriority = !priority || activity.priority === priority; const matchesTool = !tool || String(activity.tool || '').toLowerCase().includes(tool); return matchesSearch && matchesStatus && matchesPriority && matchesTool; }); }
+      function clearFilters() { byId('searchActivity').value = ''; byId('filterStatus').value = ''; byId('filterPriority').value = ''; byId('filterTool').value = ''; renderActivities(); }
+      function renderActivities() { const container = byId('activitiesContainer'); const filtered = getFilteredActivities(); if (!filtered.length) { container.innerHTML = '<div class="activity-card"><div class="helper">Nenhuma atividade encontrada com os filtros aplicados.</div></div>'; return; } container.innerHTML = filtered.map(function (activity) { const index = state.activities.indexOf(activity); const linkHtml = activity.link ? '<a class="btn btn-secondary link-button" href="' + escapeHtml(activity.link) + '" target="_blank" rel="noopener noreferrer">Abrir card</a>' : 'Sem link cadastrado'; const cardStyle = activity.status === 'concluido' ? ' style="background:#fff0f7;border-color:#f3c4dc;"' : ''; return '<div class="activity-card"' + cardStyle + '><div class="activity-head"><h3>' + escapeHtml(activity.title) + '</h3><span class="tag ' + escapeHtml(activity.status) + '">' + escapeHtml(getStatusLabel(activity.status)) + '</span></div><div class="meta"><div><strong>Categoria:</strong><br />' + escapeHtml(activity.category || '-') + '</div><div><strong>Prioridade:</strong><br /><span class="' + escapeHtml(activity.priority) + '">' + escapeHtml(getPriorityLabel(activity.priority)) + '</span></div><div><strong>Prazo:</strong><br />' + escapeHtml(formatDate(activity.dueDate)) + '</div><div><strong>Ferramenta:</strong><br />' + escapeHtml(activity.tool || '-') + '</div></div><div class="jira-box"><strong>Card / Link do Jira ou ClickUp</strong>' + linkHtml + '</div><div class="notes-box"><strong>Anotações da atividade</strong>' + escapeHtml(activity.notes || 'Sem anotações') + '</div><div class="actions"><button class="btn btn-light" type="button" onclick="window.portalApp.editActivity(' + index + ')">Editar</button><button class="btn btn-danger" type="button" onclick="window.portalApp.deleteActivity(' + index + ')">Excluir</button></div></div>'; }).join(''); }
+      function saveActivity() { const data = { title: byId('activityTitle').value.trim(), status: byId('activityStatus').value, priority: byId('activityPriority').value, dueDate: byId('activityDueDate').value, category: byId('activityCategory').value.trim(), tool: byId('activityTool').value.trim(), link: byId('activityLink').value.trim(), notes: byId('activityNotes').value.trim() }; if (!data.title) { alert('Preencha o título da atividade.'); return; } if (state.editingActivity === null) state.activities.unshift(data); else state.activities[state.editingActivity] = data; resetActivityForm(); persistState(); renderAll(); }
+      function editActivity(index) { const activity = state.activities[index]; if (!activity) return; state.editingActivity = index; byId('activityTitle').value = activity.title || ''; byId('activityStatus').value = activity.status || 'andamento'; byId('activityPriority').value = activity.priority || 'alta'; byId('activityDueDate').value = activity.dueDate || ''; byId('activityCategory').value = activity.category || ''; byId('activityTool').value = activity.tool || ''; byId('activityLink').value = activity.link || ''; byId('activityNotes').value = activity.notes || ''; window.location.hash = '#atividades'; }
+      function deleteActivity(index) { if (!window.confirm('Deseja excluir esta atividade?')) return; state.activities.splice(index, 1); if (state.editingActivity === index) resetActivityForm(); persistState(); renderAll(); }
+      function buildTimelineFromActivities() { return state.activities.filter(function (activity) { return !!activity.dueDate; }).map(function (activity) { return { date: activity.dueDate, title: activity.title, description: 'Gerado automaticamente a partir da atividade. Ferramenta: ' + (activity.tool || '-') }; }); }
+      function renderTimeline() { const container = byId('timelineContainer'); const today = new Date().toISOString().split('T')[0]; const merged = state.timeline.concat(buildTimelineFromActivities()); const sorted = merged.slice().sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); }); container.innerHTML = sorted.map(function (item) { const originalIndex = state.timeline.indexOf(item); const isGenerated = originalIndex === -1; const isLate = !!item.date && item.date < today; const itemClass = isLate ? 'timeline-item atrasado' : 'timeline-item'; const actions = isGenerated ? '<span class="helper">Gerado da atividade</span>' : '<div class="list-actions"><button class="btn btn-light" type="button" onclick="window.portalApp.editTimeline(' + originalIndex + ')">Editar</button><button class="btn btn-danger" type="button" onclick="window.portalApp.deleteTimeline(' + originalIndex + ')">Excluir</button></div>'; return '<div class="' + itemClass + '"><div class="timeline-date">' + escapeHtml(formatDate(item.date)) + '</div><div class="timeline-content"><strong>' + escapeHtml(item.title) + '</strong>' + escapeHtml(item.description || '') + '</div>' + actions + '</div>'; }).join(''); }
+      function saveTimeline() { const data = { date: byId('timelineDate').value, title: byId('timelineTitle').value.trim(), description: byId('timelineDescription').value.trim() }; if (!data.date || !data.title) { alert('Preencha a data e o título do cronograma.'); return; } if (state.editingTimeline === null) state.timeline.push(data); else state.timeline[state.editingTimeline] = data; resetTimelineForm(); persistState(); renderAll(); }
+      function editTimeline(index) { const item = state.timeline[index]; if (!item) return; state.editingTimeline = index; byId('timelineDate').value = item.date || ''; byId('timelineTitle').value = item.title || ''; byId('timelineDescription').value = item.description || ''; window.location.hash = '#cronograma'; }
+      function deleteTimeline(index) { if (!window.confirm('Deseja excluir este item do cronograma?')) return; state.timeline.splice(index, 1); if (state.editingTimeline === index) resetTimelineForm(); persistState(); renderAll(); }
+      function populateMeetingTitleFilter() { const select = byId('meetingTitleFilter'); const current = select.value; const titles = Array.from(new Set(state.meetings.map(function (meeting) { return meeting.title; }).filter(Boolean))).sort(); select.innerHTML = '<option value="">Todos os títulos</option>' + titles.map(function (title) { return '<option value="' + escapeHtml(title) + '">' + escapeHtml(title) + '</option>'; }).join(''); if (titles.indexOf(current) !== -1) select.value = current; }
+      function getFilteredMeetings() { const period = byId('meetingPeriodFilter').value || ''; const titleFilter = byId('meetingTitleFilter').value || ''; const searchText = (byId('meetingSearchText').value || '').trim().toLowerCase(); const customDate = byId('meetingCustomDate').value || ''; const sort = byId('meetingSort').value || 'desc'; const currentDate = new Date(); const meetings = state.meetings.filter(function (meeting) { const haystack = [meeting.title, meeting.topic, meeting.notes].filter(Boolean).map(function (v) { return String(v).toLowerCase(); }); const textMatch = !searchText || haystack.some(function (v) { return v.includes(searchText); }); const titleMatch = !titleFilter || meeting.title === titleFilter; if (!textMatch || !titleMatch) return false; if (!period) return true; if (!meeting.date) return false; const meetingDate = new Date(meeting.date); if (period === 'today') return getDateOnly(meeting.date) === getDateOnly(currentDate.toISOString()); if (period === 'week') return isSameWeek(meetingDate, currentDate); if (period === 'month') return meetingDate.getMonth() === currentDate.getMonth() && meetingDate.getFullYear() === currentDate.getFullYear(); if (period === 'custom') return !!customDate && getDateOnly(meeting.date) === customDate; return true; }); meetings.sort(function (a, b) { return sort === 'asc' ? String(a.date || '').localeCompare(String(b.date || '')) : String(b.date || '').localeCompare(String(a.date || '')); }); return meetings; }
+      function renderMeetings() { const container = byId('meetingsContainer'); const meetings = getFilteredMeetings(); if (!meetings.length) { container.innerHTML = '<div class="meeting-box"><div class="helper">Nenhuma reunião encontrada com os filtros aplicados.</div></div>'; return; } container.innerHTML = meetings.map(function (meeting) { const index = state.meetings.indexOf(meeting); const notesHtml = escapeHtml(String(meeting.notes || '')).replace(/\n/g, '<br />'); return '<div class="meeting-box"><strong>' + escapeHtml(meeting.title) + '</strong><span class="tag andamento" style="margin-bottom:10px; display:inline-block;">' + escapeHtml(formatDateTime(meeting.date)) + '</span><br />Data: ' + escapeHtml(formatDateTime(meeting.date)) + '<br />Tema: ' + escapeHtml(meeting.topic || '-') + '<br /><br />Notas:<br />' + notesHtml + '<div class="actions"><button class="btn btn-light" type="button" onclick="window.portalApp.editMeeting(' + index + ')">Editar</button><button class="btn btn-danger" type="button" onclick="window.portalApp.deleteMeeting(' + index + ')">Excluir</button></div></div>'; }).join(''); }
+      function saveMeeting() { const data = { title: byId('meetingTitle').value.trim(), date: byId('meetingDate').value, topic: byId('meetingTopic').value.trim(), notes: byId('meetingNotes').value.trim() }; if (!data.title || !data.date) { alert('Preencha o título e a data da reunião.'); return; } if (state.editingMeeting === null) state.meetings.unshift(data); else state.meetings[state.editingMeeting] = data; resetMeetingForm(); persistState(); renderAll(); }
+      function editMeeting(index) { const meeting = state.meetings[index]; if (!meeting) return; state.editingMeeting = index; byId('meetingTitle').value = meeting.title || ''; byId('meetingDate').value = meeting.date || ''; byId('meetingTopic').value = meeting.topic || ''; byId('meetingNotes').value = meeting.notes || ''; window.location.hash = '#reunioes'; }
+      function deleteMeeting(index) { if (!window.confirm('Deseja excluir esta reunião?')) return; state.meetings.splice(index, 1); if (state.editingMeeting === index) resetMeetingForm(); persistState(); renderAll(); }
+      function saveGeneralNotes() { state.generalNotes = byId('generalNotesInput').value.trim() || 'Sem anotações gerais.'; persistState(); renderGeneralNotes(); updateTimestamp(); }
+      function renderGeneralNotes() { byId('generalNotesInput').value = state.generalNotes; byId('generalNotesDisplay').innerHTML = '<strong>Anotações gerais</strong>' + escapeHtml(String(state.generalNotes)).replace(/\n/g, '<br />'); }
+      function getBar(label, value, total) { const percent = total ? Math.round((value / total) * 100) : 0; return '<div class="status-item"><strong>' + escapeHtml(label) + '</strong><div style="display:flex;justify-content:space-between;font-size:14px;color:#334155;margin-bottom:6px;"><span>' + value + ' item(ns)</span><span>' + percent + '%</span></div><div class="progress"><div style="width:' + percent + '%"></div></div></div>'; }
+      function renderKPIs() { const total = state.activities.length; const statusCount = { concluido: 0, andamento: 0, pendente: 0, bloqueado: 0 }; const priorityCount = { alta: 0, media: 0, baixa: 0 }; state.activities.forEach(function (activity) { statusCount[activity.status] = (statusCount[activity.status] || 0) + 1; priorityCount[activity.priority] = (priorityCount[activity.priority] || 0) + 1; }); byId('kpiTotal').textContent = String(total); byId('kpiDone').textContent = String(statusCount.concluido); byId('kpiDoing').textContent = String(statusCount.andamento); byId('kpiBlocked').textContent = String(statusCount.bloqueado); byId('statusChart').innerHTML = [getBar('Concluído', statusCount.concluido, total), getBar('Em andamento', statusCount.andamento, total), getBar('Pendente', statusCount.pendente, total), getBar('Bloqueado', statusCount.bloqueado, total)].join(''); byId('priorityChart').innerHTML = [getBar('Alta', priorityCount.alta, total), getBar('Média', priorityCount.media, total), getBar('Baixa', priorityCount.baixa, total)].join(''); const c = total ? Math.round((statusCount.concluido / total) * 100) : 0; const a = total ? c + Math.round((statusCount.andamento / total) * 100) : 0; const p = total ? a + Math.round((statusCount.pendente / total) * 100) : 0; byId('statusDonut').style.background = 'conic-gradient(#f4b6cf 0 ' + c + '%, #e79ac0 ' + c + '% ' + a + '%, #d98bb3 ' + a + '% ' + p + '%, #c979a1 ' + p + '% 100%)'; }
+      function renderWeeklyBars() { const selectedMonth = byId('monthFilter').value; const counts = [0, 0, 0, 0, 0]; const source = selectedMonth ? state.activities.filter(function (activity) { return activity.dueDate && activity.dueDate.startsWith(selectedMonth); }) : state.activities.slice(); source.forEach(function (activity) { if (!activity.dueDate) return; const day = new Date(activity.dueDate).getDate(); const weekIndex = Math.min(4, Math.floor((day - 1) / 7)); counts[weekIndex] += 1; }); const labels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5']; const max = Math.max.apply(null, counts.concat([1])); byId('weeklyBars').innerHTML = counts.map(function (count, index) { const height = Math.max(20, Math.round((count / max) * 100)); return '<div class="bar-group"><div class="bar" style="height:' + height + '%"><span>' + count + '</span></div><div class="bar-label">' + labels[index] + '</div></div>'; }).join(''); }
+      function renderGantt() { const container = byId('ganttRows'); const selectedMonth = byId('monthFilter').value || getMonthValue(new Date().toISOString()); const today = getDateOnly(new Date().toISOString()); const activities = state.activities.filter(function (activity) { return activity.dueDate && activity.dueDate.startsWith(selectedMonth); }); if (!activities.length) { container.innerHTML = '<div class="helper">Nenhuma atividade com prazo no mês selecionado.</div>'; return; } container.innerHTML = activities.map(function (activity) { const day = new Date(activity.dueDate).getDate(); const weekIndex = Math.min(4, Math.floor((day - 1) / 7)); const left = weekIndex * 20; const isLate = activity.dueDate < today && activity.status !== 'concluido'; return '<div class="gantt-row"><div><strong>' + escapeHtml(activity.title) + '</strong><br /><span class="helper">' + escapeHtml(formatDate(activity.dueDate)) + '</span></div><div class="gantt-track"><div class="gantt-bar ' + (isLate ? 'atrasado' : '') + '" style="left:' + left + '%; width:20%;">' + escapeHtml(getStatusLabel(activity.status)) + '</div></div></div>'; }).join(''); }
+      function renderAll() { populateMeetingTitleFilter(); renderActivities(); renderTimeline(); renderMeetings(); renderGeneralNotes(); renderKPIs(); renderWeeklyBars(); renderGantt(); updateTimestamp(); }
+      function exportData() { const blob = new Blob([JSON.stringify(getSerializableState(), null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); const now = new Date(); link.href = url; link.download = 'portal-atividades-backup-' + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '.json'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); }
+      function importDataFromFile(event) { const file = event.target.files && event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function (loadEvent) { try { const imported = JSON.parse(String(loadEvent.target.result || '{}')); applyImportedState(imported); renderAll(); alert('Dados importados com sucesso.'); } catch (error) { alert('Não foi possível importar o arquivo. Verifique se ele está em formato JSON válido.'); } finally { event.target.value = ''; } }; reader.readAsText(file); }
+      function bindEvents() { byId('searchActivity').addEventListener('input', renderActivities); byId('filterStatus').addEventListener('change', renderActivities); byId('filterPriority').addEventListener('change', renderActivities); byId('filterTool').addEventListener('change', renderActivities); byId('clearFiltersBtn').addEventListener('click', clearFilters); byId('saveActivityBtn').addEventListener('click', saveActivity); byId('resetActivityBtn').addEventListener('click', resetActivityForm); byId('saveTimelineBtn').addEventListener('click', saveTimeline); byId('resetTimelineBtn').addEventListener('click', resetTimelineForm); byId('meetingPeriodFilter').addEventListener('change', renderMeetings); byId('meetingCustomDate').addEventListener('change', renderMeetings); byId('meetingTitleFilter').addEventListener('change', renderMeetings); byId('meetingSearchText').addEventListener('input', renderMeetings); byId('meetingSort').addEventListener('change', renderMeetings); byId('saveMeetingBtn').addEventListener('click', saveMeeting); byId('resetMeetingBtn').addEventListener('click', resetMeetingForm); byId('saveGeneralNotesBtn').addEventListener('click', saveGeneralNotes); byId('exportDataBtn').addEventListener('click', exportData); byId('importDataBtn').addEventListener('click', function () { byId('importFileInput').click(); }); byId('importFileInput').addEventListener('change', importDataFromFile); byId('monthFilter').addEventListener('change', function () { renderWeeklyBars(); renderGantt(); }); }
+      function runSelfTests() { const results = []; function test(name, fn) { try { fn(); results.push({ name: name, ok: true }); } catch (error) { results.push({ name: name, ok: false, message: error.message }); } } function assert(condition, message) { if (!condition) throw new Error(message); }
+        test('formatDate retorna data no padrão brasileiro', function () { assert(formatDate('2026-03-17') === '17/03/2026', 'formatDate falhou'); });
+        test('formatDateTime retorna data e hora', function () { assert(formatDateTime('2026-03-17T09:30') === '17/03/2026 09:30', 'formatDateTime falhou'); });
+        test('getFilteredActivities filtra por status', function () { byId('filterStatus').value = 'concluido'; const filtered = getFilteredActivities(); assert(filtered.every(function (item) { return item.status === 'concluido'; }), 'Filtro por status falhou'); byId('filterStatus').value = ''; });
+        test('getFilteredMeetings retorna array', function () { const meetings = getFilteredMeetings(); assert(Array.isArray(meetings), 'Filtro de reuniões não retornou array'); });
+        test('getSerializableState retorna objeto exportável', function () { const snapshot = getSerializableState(); assert(Array.isArray(snapshot.activities), 'Exportação sem atividades'); assert(Array.isArray(snapshot.timeline), 'Exportação sem cronograma'); });
+        test('escapeHtml protege conteúdo HTML', function () { const dangerous = '<scr' + 'ipt>'; assert(escapeHtml(dangerous) === '&lt;script&gt;', 'escapeHtml falhou'); });
+        test('renderWeeklyBars cria 5 barras', function () { byId('monthFilter').value = '2026-03'; renderWeeklyBars(); assert(byId('weeklyBars').children.length === 5, 'Quantidade de barras incorreta'); });
+        test('lista de títulos de reunião é populada', function () { populateMeetingTitleFilter(); assert(byId('meetingTitleFilter').options.length >= 2, 'Filtro de títulos não foi populado'); });
+        test('filtro customizado de reuniões funciona', function () { byId('meetingPeriodFilter').value = 'custom'; byId('meetingCustomDate').value = '2026-03-17'; const meetings = getFilteredMeetings(); assert(meetings.length === 1, 'Filtro customizado não retornou a reunião esperada'); byId('meetingPeriodFilter').value = ''; byId('meetingCustomDate').value = ''; });
+        test('opções de ferramenta estão padronizadas', function () { assert(TOOL_OPTIONS.indexOf('Jira') !== -1 && TOOL_OPTIONS.indexOf('ClickUp') !== -1, 'Lista de ferramentas incorreta'); });
+        test('status concluido usa paleta rosa', function () { const sample = document.createElement('span'); sample.className = 'tag concluido'; document.body.appendChild(sample); const styles = window.getComputedStyle(sample); assert(styles.backgroundColor !== 'rgb(220, 252, 231)', 'Concluído não mudou para a paleta rosa'); document.body.removeChild(sample); });
+        test('renderGantt mostra estado vazio quando não há atividades no mês', function () { byId('monthFilter').value = '2027-01'; renderGantt(); assert(byId('ganttRows').textContent.indexOf('Nenhuma atividade') !== -1, 'Mensagem vazia do gantt não apareceu'); byId('monthFilter').value = '2026-03'; });
+        const panel = byId('testResults'); const passed = results.filter(function (r) { return r.ok; }).length; panel.innerHTML = results.map(function (result) { return '<div class="' + (result.ok ? 'test-ok' : 'test-fail') + '">' + (result.ok ? '✔ ' : '✖ ') + escapeHtml(result.name) + (result.ok ? '' : ' — ' + escapeHtml(result.message || 'Erro')) + '</div>'; }).join('') + '<div style="margin-top:8px;"><strong>' + passed + '/' + results.length + ' testes passaram</strong></div>'; }
+      window.portalApp = { editActivity: editActivity, deleteActivity: deleteActivity, editTimeline: editTimeline, deleteTimeline: deleteTimeline, editMeeting: editMeeting, deleteMeeting: deleteMeeting, renderWeeklyBars: renderWeeklyBars, renderMeetings: renderMeetings };
+      loadState();
+      if (!byId('monthFilter').value) byId('monthFilter').value = getMonthValue(state.activities[0] && state.activities[0].dueDate ? state.activities[0].dueDate : new Date().toISOString());
+      bindEvents();
+      renderAll();
+      runSelfTests();
+    })();
+  </script>
+</body>
+</html>
